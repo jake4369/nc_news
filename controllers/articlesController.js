@@ -1,11 +1,17 @@
 const articlesModel = require("./../models/articlesModel");
 
 exports.getAllArticles = (req, res, next) => {
-  articlesModel.getAllArticles().then((articles) => {
-    res.status(200).json({
-      articles,
-    });
-  });
+  const topic = req.query.topic || null;
+  const sort_by = req.query.sort_by || "created_at";
+  const order = req.query.order || "desc";
+  articlesModel
+    .getAllArticles(topic, sort_by, order)
+    .then((articles) => {
+      res.status(200).json({
+        articles,
+      });
+    })
+    .catch((error) => next(error));
 };
 
 exports.getArticle = (req, res, next) => {
