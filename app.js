@@ -40,6 +40,9 @@ app.patch("/api/articles/:articleId", articlesController.updateArticle);
 // 9. GET /api/users
 app.get("/api/users", usersController.getAllUsers);
 
+// 12. DELETE /api/comments/:comment_id
+app.delete("/api/comments/:commentId", commentsController.deleteComment);
+
 app.all("*", (req, res) => {
   res.status(400).send({ message: "Path not found!" });
 });
