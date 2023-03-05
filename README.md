@@ -1,7 +1,7 @@
 # Northcoders News API
 
 This is an API for Northcoders new website.
-Users can browse game articles, topics, and leave comments on articles.
+Users can browse news articles, topics, and leave comments on articles.
 
 You can go to [https://nc-news-api-aqzx.onrender.com/api] to start using the API
 
