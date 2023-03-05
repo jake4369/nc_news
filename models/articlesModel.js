@@ -1,19 +1,63 @@
 const db = require("./../db/connection");
 
-exports.getAllArticles = () => {
+exports.getAllArticles = (
+  topic = null,
+  sort_by = "created_at",
+  order = "desc"
+) => {
+  const allowedColumns = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  const allowedOrders = ["asc", "desc"];
+
+  if (!allowedColumns.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid sort query",
+    });
+  }
+  if (!allowedOrders.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid order query",
+    });
+  }
+
+  const queryValues = [];
+  let queryStr = `
+  SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count
+  FROM articles
+  LEFT JOIN comments ON comments.article_id = articles.article_id
+  `;
+
+  if (topic) {
+    queryStr += ` WHERE topic ILIKE $1`;
+    queryValues.push(`%${topic}%`);
+  }
+
+  queryStr += `
+    GROUP BY articles.article_id
+    ORDER BY ${sort_by} ${order}
+  `;
+
   return db
-    .query(
-      `
-        SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count
-        FROM articles
-        LEFT JOIN comments ON comments.article_id = articles.article_id
-        GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC;
-    `
-    )
+    .query(queryStr, queryValues)
     .then((results) => {
       const articles = results.rows;
-      return articles;
+      if (topic && articles.length === 0) {
+        return [];
+      } else {
+        return articles;
+      }
     })
     .catch((error) => {
       return { error: "Unable to retrieve articles from the database" };
