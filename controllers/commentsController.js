@@ -22,3 +22,14 @@ exports.addCommentToArticle = (req, res, next) => {
     })
     .catch((error) => next(error));
 };
+
+exports.deleteComment = (req, res, next) => {
+  const { commentId } = req.params;
+
+  commentsModel
+    .deleteComment(commentId)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((error) => next(error));
+};
