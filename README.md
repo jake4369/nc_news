@@ -1,57 +1,50 @@
 # Northcoders News API
 
-## Background
+This is an API for Northcoders new website.
+Users can browse game articles, topics, and leave comments on articles.
 
-We will be building an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
+You can go to [https://nc-news-api-aqzx.onrender.com/api] to start using the API
 
-Your database will be PSQL, and you will interact with it using [node-postgres](https://node-postgres.com/).
+# Installation
 
-## Kanban
+To get started, you'll need to have at minimum, Node.js v19.3.0 and PostgreSQL v15.1
+installed on your machine. Then, follow these steps:
 
-### Link to your Trello Board here: https://trello.com/b/7yiHe1nI
+# Clone the repository
 
-To keep track of the tasks involved in this project we're going to use a kanban board. Ensure that you work on one _ticket_ at time. You can click on the ticket to find out more information about what is required for the feature. A ticket is not considered complete unless both the happy path and errors response are handled. You can make use of the checklist on each ticket to keep track of the errors you want to handle. You can also make use of [error-handling.md](error-handling.md) to consider the error codes we may wish to respond with.
+git clone https://github.com/jake4369/nc_news
 
-**Please ensure you work through the tickets in numerical order.**
+# Navigate to the project directory
 
-## Git Branching and Pull Requests
+cd nc-news
 
-You will be working on each ticket on a new **branch**.
+# Install dependencies
 
-To create and switch to a new git branch use the command:
+npm install or npm i
 
-```
-git checkout -b <new branch name>
-```
+# Seed the database
 
-This will create a branch and move over to that branch. (Omit the `-b` flag if you wish to switch to an already existing branch).
+npm run seed
 
-We recommend that you name the branch after the number assigned to each ticket via the header. eg. `ncnews-1`
+# Run the tests
 
-When pushing the branch to git hub ensure that you make reference to the branch you are pushing to on the remote.
+npm run test
 
-```
-git push origin <branch name>
-```
+# Setting Up Environment Variables
 
-From github you can make a pull request and share the link and ticket number via a pull request specific nchelp using the command `nchelp pr`. A tutor will swing by to review your code. Ensure that you keep your trello up to date whilst you await the PR approval. Regular `nchelp` will be available for when you need support.
+The app requires two .env files, one for testing and one for production.
 
-Once a pull request been accepted be sure to switch back to the main branch and pull down the updated changes.
+To set up the .env.test file:
 
-```
-git checkout main
+Create a new file in the project's root directory called .env.test.
+Add the following line to the file: PGDATABASE=nc_news_test
+Save the file.
+To set up the .env.production file:
 
-git pull origin main
-```
+Create a new file in the project's root directory called .env.production.
+Add the following line to the file: PGDATABASE=nc_news
+Save the file.
 
-You can tidy up your local branches once they have been pull into main by deleting them:
+Here, nc_news_test is the name of the database to use for running tests, and nc_news is the name of the database to use in production.
 
-```
-git branch -D <local branch>
-```
-
-## Husky
-
-To ensure we are not commiting broken code this project makes use of git hooks. Git hooks are scripts triggered during certain events in the git lifecycle. Husky is a popular package which allows us to set up and maintain these scripts. This project makes use a _pre-commit hook_. When we attempt to commit our work, the script defined in the `pre-commit` file will run. If any of our tests fail than the commit will be aborted.
-
-The [Husky documentation](https://typicode.github.io/husky/#/) explains how to configure Husky for your own project as well as creating your own custom hooks.\_
+DO NOT commit these files to Github as they might contain sensitive information.
