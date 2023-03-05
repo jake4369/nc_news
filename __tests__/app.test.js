@@ -727,6 +727,27 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+// 13. GET /api
+describe("GET /api", () => {
+  it("should respond with the correct JSON file", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        const { endpoints } = body;
+        expect(typeof endpoints).toBe("object");
+        Object.values(endpoints).forEach((endpoint) => {
+          expect(endpoint).toHaveProperty("description", expect.any(String));
+          expect(endpoint).toHaveProperty("queries"), expect.any(Object);
+          expect(endpoint).toHaveProperty(
+            "exampleResponse",
+            expect.any(Object)
+          );
+        });
+      });
+  });
+});
+
 describe("400 error on /api/not-path", () => {
   it("status 400 returns error message bad path when provided an invalid path", () => {
     return request(app)
