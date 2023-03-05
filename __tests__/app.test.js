@@ -648,6 +648,49 @@ describe("GET /api/articles/topic", () => {
   });
 });
 
+// 11. GET /api/articles/:article_id (comment count)
+describe("GET /api/articles/:article_id (comment count)", () => {
+  it("respond with an article object, with the correct properties", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      body: expect.any(String),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toMatchObject(expectedObject);
+      });
+  });
+  it("should respond with a 404 status code if a valid ID is given, but no article is found", () => {
+    return request(app)
+      .get("/api/articles/100000")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("No article found");
+      });
+  });
+  it("should respond with a 400 status code if given an invalid ID such as a string", () => {
+    return request(app)
+      .get("/api/articles/invalidID")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid input");
+      });
+  });
+});
+
 describe("400 error on /api/not-path", () => {
   it("status 400 returns error message bad path when provided an invalid path", () => {
     return request(app)
