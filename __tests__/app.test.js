@@ -691,6 +691,42 @@ describe("GET /api/articles/:article_id (comment count)", () => {
   });
 });
 
+// 12. DELETE /api/comments/:comment_id
+describe("DELETE /api/comments/:comment_id", () => {
+  it("should delete the comment with the given ID", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(1);
+          });
+      });
+  });
+  it("should return a 400 status code if given an invalid ID", () => {
+    return request(app)
+      .delete("/api/comments/invalidId")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid input");
+      });
+  });
+  it("should respond with a 404 status code if given a valid Id type but comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/10000")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Comment not found");
+      });
+  });
+});
+
 describe("400 error on /api/not-path", () => {
   it("status 400 returns error message bad path when provided an invalid path", () => {
     return request(app)
