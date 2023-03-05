@@ -12,6 +12,24 @@ beforeEach(() => {
 
 afterAll(() => db.end());
 
+function isSortedAscending(arr, key) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i + 1][key] < arr[i][key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isSortedDescending(arr, key) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i + 1][key] > arr[i][key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // 3. GET /api/topics
 describe("GET /api/topics", () => {
   it("responds with an array of topic objects, each of which should have the following properties: 'slug' and 'description'", () => {
@@ -53,7 +71,7 @@ describe("GET /api/articles", () => {
         articles.forEach((article) =>
           expect(article).toMatchObject(expectedObject)
         );
-        expect(articles).toBeSorted({ descending: true });
+        expect(isSortedDescending(articles)).toBe(true);
       });
   });
 });
@@ -121,7 +139,7 @@ describe("/api/articles/:article_id/comments", () => {
         comments.forEach((comment) =>
           expect(comment).toMatchObject(expectedObject)
         );
-        expect(comments).toBeSorted({ descending: true });
+        expect(isSortedDescending(comments)).toBe(true);
       });
   });
   it("should respond with a 404 status code if given a valid ID type but no review exists", () => {
@@ -370,6 +388,262 @@ describe("GET /api/users", () => {
         expect(Array.isArray(users)).toBe(true);
         expect(users.length).toBe(4);
         users.forEach((user) => expect(user).toMatchObject(expectedObject));
+      });
+  });
+});
+
+// 10. GET /api/articles (queries)
+describe("GET /api/articles/topic", () => {
+  it("should respond with all articles if query is omitted", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(12);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles)).toBe(true);
+      });
+  });
+  it("returns an empty array if category query is valid, but has no corresponding reviews", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(0);
+        expect(articles).toEqual([]);
+      });
+  });
+  it("should respond with an array containing only articles where topic is equal to query", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(11);
+        articles.forEach((article) => {
+          expect(article).toMatchObject(expectedObject);
+        });
+      });
+  });
+  it("should respond with an array of articles, and sort_by should sort by date by default", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?sort_by")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(12);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles, "created_at")).toBe(true);
+      });
+  });
+  it("should respond with an array of articles, sorted in descending order, by given column", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(12);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles, "title")).toBe(true);
+      });
+  });
+  it("should respond with array of artices with a given topic, sorted by given column in descending", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=body")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(11);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles)).toBe(true);
+      });
+  });
+  it("should respond with an array of all articles, sorted in ascending order", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(12);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedAscending(articles)).toBe(true);
+      });
+  });
+  it("should respond with an array of all articles, sorted in descending order", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(12);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles)).toBe(true);
+      });
+  });
+  it("should respond with an array of articles with given topic, sorted in ascending order of given column", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(11);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedAscending(articles)).toBe(true);
+      });
+  });
+  it("should respond with an array of articles with given topic, sorted in descending order of given column", () => {
+    const expectedObject = {
+      author: expect.any(String),
+      title: expect.any(String),
+      article_id: expect.any(Number),
+      topic: expect.any(String),
+      created_at: expect.any(String),
+      votes: expect.any(Number),
+      article_img_url: expect.any(String),
+      comment_count: expect.any(Number),
+    };
+
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBe(11);
+        articles.forEach((article) =>
+          expect(article).toMatchObject(expectedObject)
+        );
+        expect(isSortedDescending(articles)).toBe(true);
+      });
+  });
+  it("responds with a 400 status code if given an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid_query")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid sort query");
+      });
+  });
+  it("should respond with a 400 status code when given an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=invalid")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid order query");
       });
   });
 });
