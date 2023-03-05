@@ -8,9 +8,10 @@ const {
   handlePsqlErrors,
   handleServerErrors,
 } = require("./controllers/errorHandlingController");
-const topicsController = require("./controllers/topicsController");
 const articlesController = require("./controllers/articlesController");
 const commentsController = require("./controllers/commentsController");
+const endpointsController = require("./controllers/endpointsController");
+const topicsController = require("./controllers/topicsController");
 const usersController = require("./controllers/usersController");
 
 // 3. GET /api/topics
@@ -42,6 +43,9 @@ app.get("/api/users", usersController.getAllUsers);
 
 // 12. DELETE /api/comments/:comment_id
 app.delete("/api/comments/:commentId", commentsController.deleteComment);
+
+// 13. GET /api
+app.get("/api", endpointsController.getEndpoints);
 
 app.all("*", (req, res) => {
   res.status(400).send({ message: "Path not found!" });
