@@ -1,5 +1,6 @@
 const db = require("./../db/connection");
 
+// Get comments for each article
 exports.getCommentsByArticleId = (articleId) => {
   return db
     .query(
@@ -22,6 +23,7 @@ exports.getCommentsByArticleId = (articleId) => {
     });
 };
 
+// Add comment
 exports.addCommentToArticle = (articleId, username, body) => {
   if (!username || !body) {
     return Promise.reject({
@@ -67,6 +69,7 @@ exports.addCommentToArticle = (articleId, username, body) => {
     });
 };
 
+// Delete comment
 exports.deleteComment = (commentId) => {
   return db
     .query(
@@ -76,6 +79,30 @@ exports.deleteComment = (commentId) => {
       RETURNING *;
     `,
       [commentId]
+    )
+    .then((result) => {
+      if (result.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Comment not found",
+        });
+      }
+      const comment = result.rows[0];
+      return comment;
+    });
+};
+
+// Update votes
+exports.updateVotes = (newVote, commentId) => {
+  return db
+    .query(
+      `
+      UPDATE comments
+      SET votes = votes + $1
+      WHERE article_id = $2
+      RETURNING *;
+    `,
+      [newVote, commentId]
     )
     .then((result) => {
       if (result.rowCount === 0) {
