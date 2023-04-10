@@ -777,6 +777,93 @@ describe("GET /api/users/:username", () => {
   });
 });
 
+// 18. PATCH /api/comments/:comment_id
+describe("PATCH /api/comments/:comment_id", () => {
+  it("should respond with an object with the correct properties and the votes incremented", () => {
+    const expectedObject = {
+      body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+      votes: 15,
+      author: "butter_bridge",
+      article_id: 1,
+      comment_id: 2,
+      created_at: expect.any(String),
+    };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toEqual(expectedObject);
+      });
+  });
+
+  it("should respond with an object with the correct properties and the votes decremented", () => {
+    const expectedObject = {
+      body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+      votes: 13,
+      author: "butter_bridge",
+      article_id: 1,
+      comment_id: 2,
+      created_at: expect.any(String),
+    };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toEqual(expectedObject);
+      });
+  });
+
+  it("should respond with a 400 status and error message if newVote is not a number", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: "string" })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid input");
+      });
+  });
+
+  it("responds with a 400 status code when passed an invalid request body", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ wrong_key: 100 })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid or missing key in patch body");
+      });
+  });
+
+  it("responds with a 400 status code and an error message when passed an invalid review id", () => {
+    return request(app)
+      .patch("/api/comments/banana")
+      .send({ incVotes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Invalid input");
+      });
+  });
+
+  it("should respond with a 404 status code if given the ID of a non-existent review", () => {
+    return request(app)
+      .patch("/api/comments/1000")
+      .send({ incVotes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Comment not found");
+      });
+  });
+});
+
 describe("400 error on /api/not-path", () => {
   it("status 400 returns error message bad path when provided an invalid path", () => {
     return request(app)
