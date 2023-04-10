@@ -1,5 +1,6 @@
 const commentsModel = require("./../models/commentsModel.js");
 
+// Get comments
 exports.getCommentsByArticleId = (req, res, next) => {
   const { articleId } = req.params;
 
@@ -11,6 +12,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
     .catch((error) => next(error));
 };
 
+// Add comment
 exports.addCommentToArticle = (req, res, next) => {
   const { articleId } = req.params;
   const { username, body } = req.body;
@@ -23,6 +25,7 @@ exports.addCommentToArticle = (req, res, next) => {
     .catch((error) => next(error));
 };
 
+// Delete comment
 exports.deleteComment = (req, res, next) => {
   const { commentId } = req.params;
 
@@ -34,6 +37,7 @@ exports.deleteComment = (req, res, next) => {
     .catch((error) => next(error));
 };
 
+// Update votes
 exports.updateVotes = (req, res, next) => {
   const { commentId } = req.params;
   const { inc_votes } = req.body;
