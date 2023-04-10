@@ -33,3 +33,15 @@ exports.deleteComment = (req, res, next) => {
     })
     .catch((error) => next(error));
 };
+
+exports.updateVotes = (req, res, next) => {
+  const { commentId } = req.params;
+  const { inc_votes } = req.body;
+
+  commentsModel
+    .updateVotes(inc_votes, commentId)
+    .then((comment) => {
+      res.status(200).json({ comment });
+    })
+    .catch((error) => next(error));
+};
