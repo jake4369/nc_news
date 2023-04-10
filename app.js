@@ -50,8 +50,11 @@ app.delete("/api/comments/:commentId", commentsController.deleteComment);
 // 13. GET /api
 app.get("/api", endpointsController.getEndpoints);
 
+// 17. GET /api/users/:username
+app.get("/api/users/:username", usersController.getUser);
+
 app.all("*", (req, res) => {
-  res.status(400).send({ message: "Path not found!" });
+  res.status(400).send({ msg: "Path not found!" });
 });
 
 app.use(handleCustomErrors);
