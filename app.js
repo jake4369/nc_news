@@ -53,6 +53,9 @@ app.get("/api", endpointsController.getEndpoints);
 // 17. GET /api/users/:username
 app.get("/api/users/:username", usersController.getUser);
 
+// 18. PATCH /api/comments/:comment_id
+app.patch("/api/comments/:commentId", commentsController.updateVotes);
+
 app.all("*", (req, res) => {
   res.status(400).send({ msg: "Path not found!" });
 });
