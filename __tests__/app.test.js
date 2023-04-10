@@ -748,14 +748,43 @@ describe("GET /api", () => {
   });
 });
 
+// 17. GET /api/users/:username
+describe("GET /api/users/:username", () => {
+  it("should respond with a user object with the correct properties", () => {
+    const expectedObject = {
+      username: expect.any(String),
+      name: expect.any(String),
+      avatar_url: expect.any(String),
+    };
+
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body }) => {
+        const { user } = body;
+        expect(user).toEqual(expectedObject);
+      });
+  });
+
+  it("should respond with 404 status code and correct error message if no user is found", () => {
+    return request(app)
+      .get("/api/users/testUser")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("No user found");
+      });
+  });
+});
+
 describe("400 error on /api/not-path", () => {
   it("status 400 returns error message bad path when provided an invalid path", () => {
     return request(app)
       .get("/api/not-path")
       .expect(400)
       .then(({ body }) => {
-        const { message } = body;
-        expect(message).toBe("Path not found!");
+        const { msg } = body;
+        expect(msg).toBe("Path not found!");
       });
   });
 });
