@@ -131,11 +131,11 @@ describe("/api/articles/:article_id/comments", () => {
     };
 
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/articles/1/comments?page=1&limit=3")
       .expect(200)
       .then(({ body }) => {
         const { comments } = body;
-        expect(comments.length).toBe(11);
+        expect(comments.length).toBe(3);
         comments.forEach((comment) =>
           expect(comment).toMatchObject(expectedObject)
         );
@@ -144,7 +144,7 @@ describe("/api/articles/:article_id/comments", () => {
   });
   it("should respond with a 404 status code if given a valid ID type but no review exists", () => {
     return request(app)
-      .get("/api/articles/100000/comments")
+      .get("/api/articles/100000/comments?page=1&limit=3")
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
@@ -153,7 +153,7 @@ describe("/api/articles/:article_id/comments", () => {
   });
   it("should respond with a 400 status code if given an invalid ID type such as a string", () => {
     return request(app)
-      .get("/api/articles/invalidID/comments")
+      .get("/api/articles/invalidID/comments?page=1&limit=3")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
@@ -171,7 +171,7 @@ describe("POST /api/articles/:article_id/comments", () => {
     };
 
     return request(app)
-      .post("/api/articles/1/comments")
+      .post("/api/articles/1/comments?page=1&limit=3")
       .send(testComment)
       .expect(201)
       .then(({ body }) => {
@@ -184,11 +184,11 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .then(() => {
         return request(app)
-          .get("/api/articles/1/comments")
+          .get("/api/articles/1/comments?page=1&limit=3")
           .expect(200)
           .then(({ body }) => {
             const { comments } = body;
-            expect(comments.length).toBe(12);
+            expect(comments.length).toBe(3);
           });
       });
   });
@@ -695,11 +695,11 @@ describe("GET /api/articles/:article_id (comment count)", () => {
 describe("DELETE /api/comments/:comment_id", () => {
   it("should delete the comment with the given ID", () => {
     return request(app)
-      .delete("/api/comments/1")
+      .delete("/api/comments/1?page=1&limit=3")
       .expect(204)
       .then(() => {
         return request(app)
-          .get("/api/articles/9/comments")
+          .get("/api/articles/9/comments?page=1&limit=3")
           .expect(200)
           .then(({ body }) => {
             const { comments } = body;

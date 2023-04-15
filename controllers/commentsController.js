@@ -1,13 +1,27 @@
 const commentsModel = require("./../models/commentsModel.js");
 
 // Get comments
+// exports.getCommentsByArticleId = (req, res, next) => {
+//   const { articleId } = req.params;
+
+//   commentsModel
+//     .getCommentsByArticleId(articleId)
+//     .then((comments) => {
+//       res.status(200).json({ comments_total: comments.length, comments });
+//     })
+//     .catch((error) => next(error));
+// };
+
 exports.getCommentsByArticleId = (req, res, next) => {
   const { articleId } = req.params;
+  const { page, limit } = req.query; // Extract page and limit from query parameters
+
+  const offset = (page - 1) * limit; // Calculate the offset for pagination
 
   commentsModel
-    .getCommentsByArticleId(articleId)
+    .getCommentsByArticleId(articleId, offset, limit) // Pass offset and limit to the function
     .then((comments) => {
-      res.status(200).json({ comments });
+      res.status(200).json({ comments_total: comments.length, comments });
     })
     .catch((error) => next(error));
 };

@@ -1,15 +1,38 @@
 const db = require("./../db/connection");
 
 // Get comments for each article
-exports.getCommentsByArticleId = (articleId) => {
+// exports.getCommentsByArticleId = (articleId) => {
+//   return db
+//     .query(
+//       `
+//          SELECT * FROM comments
+//          WHERE article_id = $1
+//          ORDER BY comments.created_at DESC;
+//         `,
+//       [articleId]
+//     )
+//     .then((results) => {
+//       if (results.rowCount === 0) {
+//         return Promise.reject({
+//           status: 404,
+//           msg: "No review found",
+//         });
+//       }
+//       const comments = results.rows;
+//       return comments;
+//     });
+// };
+
+exports.getCommentsByArticleId = (articleId, offset, limit) => {
+  // Update the function signature to include offset and limit
   return db
     .query(
       `
          SELECT * FROM comments
          WHERE article_id = $1
-         ORDER BY comments.created_at DESC;
-        `,
-      [articleId]
+         ORDER BY comments.created_at DESC
+         LIMIT $2 OFFSET $3;`, // Use LIMIT and OFFSET for pagination
+      [articleId, limit, offset] // Pass articleId, limit, and offset as query parameters
     )
     .then((results) => {
       if (results.rowCount === 0) {
